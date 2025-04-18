@@ -1,7 +1,7 @@
 {
   "name": "@consensu.al/react-native-logger",
   "version": "0.1.0",
-  "description": "A flexible, secure, and feature-rich logging system for React Native applications",
+  "description": "A flexible, secure, and feature-rich on device logging system for React Native applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [

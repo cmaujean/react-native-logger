@@ -1,6 +1,6 @@
 # Logger Tests
 
-This directory contains tests for the @consensual/react-native-logger package. The tests are written using Jest with Bun as the runtime.
+This directory contains tests for the @consensu.al/react-native-logger package. The tests are written using Jest with Bun as the runtime.
 
 ## Running Tests
 
@@ -33,8 +33,9 @@ bun test:watch
 ## Notes on Test Environment
 
 - The tests use Jest as the test framework with Bun as the runtime
-- The `jest.setup.ts` file provides global mocks and environment setup
-- Some tests, particularly those involving console mocking and React components, are currently skipped
+- The `jest.setup.ts` file provides global mocks and environment setup including console mocking
+- All tests are now operational, including console logging tests and React component tests
+- A custom AsyncStorage mock is implemented in the `__mocks__` directory for React tests
 
 ## Writing Tests
 
@@ -43,10 +44,12 @@ When writing new tests:
 1. Follow the existing patterns for structure and organization
 2. Use Jest's `jest.fn()` for mocking functions
 3. Keep tests isolated and avoid shared state
-4. For React component tests, use `@testing-library/react-hooks` for hook testing (requires proper React test renderer setup)
+4. For React component tests, use `@testing-library/react-hooks` for hook testing
+5. For console tests, use the global mockConsole object provided in the setup file
+6. Always import React properly for JSX even if it's only used for types: `import * as React from "react";`
 
 ## Known Issues
 
-- Console mocking is complicated when using Bun as the runtime, so those tests are skipped
-- React component tests require proper setup of react-test-renderer with the correct React version
-- Running tests in the /dist directory can cause duplicate test runs
+- React tests show deprecation warnings about react-test-renderer being deprecated. These warnings don't affect functionality.
+- When running React tests, you may see warnings about "The current testing environment is not configured to support act(...)". These are harmless.
+- TypeScript compilation no longer includes test files in the dist directory as we've fixed the tsconfig.json configuration.

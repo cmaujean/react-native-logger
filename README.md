@@ -1,6 +1,6 @@
-# React Native Consensual Logger
+# Consensu.al React Native Logger
 
-A flexible, secure, and feature-rich logging system for React Native applications.
+A flexible, secure, and feature-rich on device logging system for React Native applications.
 
 ## Features
 
@@ -13,11 +13,11 @@ A flexible, secure, and feature-rich logging system for React Native application
 ## Installation
 
 ```bash
-npm install @consensual/react-native-logger
+npm install @consensu.al/react-native-logger
 # or
-yarn add @consensual/react-native-logger
+yarn add @consensu.al/react-native-logger
 # or 
-bun add @consensual/react-native-logger
+bun add @consensu.al/react-native-logger
 ```
 
 ## Quick Start
@@ -25,7 +25,7 @@ bun add @consensual/react-native-logger
 ### Basic Usage
 
 ```typescript
-import { logger } from '@consensual/react-native-logger';
+import { logger } from '@consensu.al/react-native-logger';
 
 // Simple logging
 logger.log('User signed in');
@@ -36,7 +36,7 @@ logger.error('Failed to fetch data', error);
 ### With Database Persistence (Drizzle)
 
 ```typescript
-import { createLogger, createDrizzleAdapter, logsTable } from '@consensual/react-native-logger';
+import { createLogger, createDrizzleAdapter, logsTable } from '@consensu.al/react-native-logger';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { openDatabase } from 'expo-sqlite';
 
@@ -61,7 +61,7 @@ For apps that need a global logger instance with database persistence and settin
 
 ```typescript
 // In a file like src/services/logger.ts
-import { initializeLoggerSingleton, createDrizzleAdapter } from '@consensual/react-native-logger';
+import { initializeLoggerSingleton, createDrizzleAdapter } from '@consensu.al/react-native-logger';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { openDatabase } from 'expo-sqlite';
 
@@ -86,7 +86,7 @@ Then in your app's entry point:
 // In App.tsx or index.tsx
 import React from 'react';
 import { View, Text } from 'react-native';
-import { LoggerProvider } from '@consensual/react-native-logger';
+import { LoggerProvider } from '@consensu.al/react-native-logger';
 import { logger } from './src/services/logger';
 
 // Import the singleton instance to ensure it's initialized
@@ -137,7 +137,7 @@ export default App;
 ```tsx
 import React from 'react';
 import { View, Button } from 'react-native';
-import { useLogger, LoggerProvider } from '@consensual/react-native-logger';
+import { useLogger, LoggerProvider } from '@consensu.al/react-native-logger';
 
 function MyComponent() {
   const { log, warn, error } = useLogger(logger);
@@ -168,7 +168,7 @@ function App() {
 ```tsx
 import React, { useEffect, useState } from 'react';
 import { FlatList, Text, View, Button } from 'react-native';
-import { useLoggerSettings, getLogs, clearLogs } from '@consensual/react-native-logger';
+import { useLoggerSettings, getLogs, clearLogs } from '@consensu.al/react-native-logger';
 
 function LogsScreen() {
   const [logs, setLogs] = useState([]);
@@ -245,31 +245,34 @@ function LogsScreen() {
 This library uses Jest with Bun as the test runner. The test suite is divided into two projects:
 
 1. `node` - Core functionality tests (redaction, logger, database, singleton)
-2. `react` - React integration tests (currently disabled until React/Jest/Bun compatibility issues are resolved)
+2. `react` - React integration tests
 
 To run the tests:
 
 ```bash
-# Run all core tests
+# Run all tests
 bun test
 
 # Run tests in watch mode
 bun test:watch
+
+# Run only React tests
+bun test:react
 ```
 
 #### Notes on Test Environment
 
 The current test setup has the following characteristics:
 
-1. Core functionality tests are fully operational and pass successfully
-2. React component tests are temporarily disabled due to compatibility issues between Jest, React, and Bun
-3. Some tests are skipped (mainly those that mock console output) but will be re-enabled in future updates
+1. All tests are now fully operational and pass successfully
+2. React component tests now run correctly alongside the core tests
+3. Console logging tests work properly with our custom setup
 4. Tests run with Bun for improved performance
 
 #### Known Issues
 
-- When running tests, you may see warnings about the dist directory tests. These can be safely ignored as they are duplicates of the source tests.
-- React component testing is currently disabled and will be fixed in a future update.
+- React tests show some deprecation warnings about react-test-renderer being deprecated. These warnings do not affect functionality and are related to the testing library, not our code.
+- When running React tests, you may see warnings about "The current testing environment is not configured to support act(...)". These are harmless warnings from the React testing library.
 
 ## License
 
