@@ -5,6 +5,8 @@
  * For complete testing, run in a real React Native environment.
  */
 // Need to import React for JSX even though it's only used as a type in some places
+
+// biome-ignore lint/style/useImportType: doesn't work if we import as type only, yet biome complains if we don't
 import * as React from "react";
 import { renderHook } from "@testing-library/react-hooks";
 
