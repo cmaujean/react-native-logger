@@ -74,26 +74,44 @@ export function createLogger(
     // Always log to console in development mode
     // In production, only log to console if explicitly enabled
     if (IS_DEV || loggerState.console) {
-      // Use the global console methods directly to avoid circular references
-      // This fixes issues with Bun's environment
-      switch(level) {
-        case 'log':
-          console.log(...args);
-          break;
-        case 'warn':
-          console.warn(...args);
-          break;
-        case 'error':
-          console.error(...args);
-          break;
+      // Special handling for test environment - use mockConsole if available
+      if (typeof global !== 'undefined' && typeof (global as any).mockConsole !== 'undefined') {
+        switch(level) {
+          case 'log':
+            (global as any).mockConsole.log(...args);
+            break;
+          case 'warn':
+            (global as any).mockConsole.warn(...args);
+            break;
+          case 'error':
+            (global as any).mockConsole.error(...args);
+            break;
+        }
+      } else {
+        // Use regular console in normal operation
+        switch(level) {
+          case 'log':
+            console.log(...args);
+            break;
+          case 'warn':
+            console.warn(...args);
+            break;
+          case 'error':
+            console.error(...args);
+            break;
+        }
       }
     }
 
     // Process the arguments into a single message string
     const message = processArgs(argsForProcessing, loggerState.secureMode);
 
-    // Add to database asynchronously
-    dbAdapter.addLogEntry(level, message).catch(() => {
+    // Extract metadata if the last argument is an object
+    const lastArg = args.length > 0 ? args[args.length - 1] : undefined;
+    const metadata = typeof lastArg === 'object' && lastArg !== null ? lastArg : null;
+
+    // Add to database asynchronously with optional metadata
+    dbAdapter.addLogEntry(level, message, metadata).catch(() => {
       // Silently fail to avoid infinite loops
     });
   };

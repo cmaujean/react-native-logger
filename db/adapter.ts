@@ -8,8 +8,11 @@ import { IS_DEV } from '../constants';
 export interface LoggerDbAdapter {
   /**
    * Add a log entry to the database
+   * @param level Log level (debug, info, warn, error)
+   * @param message Log message text
+   * @param metadata Optional metadata object to store with the log
    */
-  addLogEntry: (level: LogLevel, message: string) => Promise<void>;
+  addLogEntry: (level: LogLevel, message: string, metadata?: Record<string, any>) => Promise<void>;
   
   /**
    * Get all logs from the database
@@ -26,7 +29,7 @@ export interface LoggerDbAdapter {
  * No-op adapter for when no database is provided
  */
 export const noopAdapter: LoggerDbAdapter = {
-  async addLogEntry() {
+  async addLogEntry(_level: LogLevel, _message: string, _metadata?: Record<string, any>) {
     // Do nothing
     return Promise.resolve();
   },

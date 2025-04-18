@@ -1,13 +1,29 @@
 import { initializeLoggerSingleton, logger, log, warn, error, enableLogging, enableSecureMode, getLoggerConfig } from "../singleton";
 import { LogLevel } from "../types";
 
-// Helper function for Bun to make testing easier
-const setupTest = () => {
-  // Reset any previous invocations
+describe("Logger singleton", () => {
+  // Set up mocks for console methods
+  const mockConsole = {
+    log: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn()
+  };
+
+  // Store original console methods
+  const originalConsole = {
+    log: console.log,
+    warn: console.warn,
+    error: console.error
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Additional setup specific for singleton tests
+    // Set up mock console methods for each test
+    console.log = mockConsole.log;
+    console.warn = mockConsole.warn;
+    console.error = mockConsole.error;
+    
     // Reset the singleton at the start of each test
     initializeLoggerSingleton({
       enabled: false,
@@ -15,11 +31,13 @@ const setupTest = () => {
       console: false,
     });
   });
-};
 
-describe("Logger singleton", () => {
-  // Setup the test environment
-  setupTest();
+  afterEach(() => {
+    // Restore original console methods
+    console.log = originalConsole.log;
+    console.warn = originalConsole.warn;
+    console.error = originalConsole.error;
+  });
 
   test("should have default singleton instance", () => {
     // We initialize with disabled in our test setup, but let's re-initialize with default settings
@@ -57,7 +75,7 @@ describe("Logger singleton", () => {
   
   test("should use the custom database adapter", () => {
     const mockAdapter = {
-      addLogEntry: jest.fn((level: LogLevel, message: string) => Promise.resolve()),
+      addLogEntry: jest.fn((level: LogLevel, message: string, metadata?: Record<string, any>) => Promise.resolve()),
       getLogs: jest.fn(() => Promise.resolve([])),
       clearLogs: jest.fn(() => Promise.resolve(true)),
     };
@@ -72,7 +90,7 @@ describe("Logger singleton", () => {
     
     // Verify the adapter was called
     expect(mockAdapter.addLogEntry).toHaveBeenCalledTimes(1);
-    expect(mockAdapter.addLogEntry).toHaveBeenCalledWith("log", expect.any(String));
+    expect(mockAdapter.addLogEntry).toHaveBeenCalledWith("log", expect.any(String), null);
     
     // Also verify that the global functions now use this adapter
     log("Test message for global adapter");
@@ -92,9 +110,9 @@ describe("Logger singleton", () => {
     error("Test error message");
     
     // Verify console methods were called
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1);
-    expect((global as any).mockConsole.warn).toHaveBeenCalledTimes(1);
-    expect((global as any).mockConsole.error).toHaveBeenCalledTimes(1);
+    expect(mockConsole.log).toHaveBeenCalledTimes(1);
+    expect(mockConsole.warn).toHaveBeenCalledTimes(1);
+    expect(mockConsole.error).toHaveBeenCalledTimes(1);
   });
   
   test("should respect enableLogging settings", () => {
@@ -105,17 +123,17 @@ describe("Logger singleton", () => {
     
     // Test with logging enabled
     log("This should be logged");
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1);
+    expect(mockConsole.log).toHaveBeenCalledTimes(1);
     
     // Disable logging
     enableLogging(false);
     log("This should not be logged");
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1); // Still 1, not incremented
+    expect(mockConsole.log).toHaveBeenCalledTimes(1); // Still 1, not incremented
     
     // Re-enable logging
     enableLogging(true);
     log("This should be logged again");
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(2);
+    expect(mockConsole.log).toHaveBeenCalledTimes(2);
   });
   
   test("singleton methods should handle multiple arguments", () => {
@@ -125,8 +143,8 @@ describe("Logger singleton", () => {
     });
     
     log("Message 1", "Message 2", { data: "test" });
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1);
-    expect((global as any).mockConsole.log).toHaveBeenCalledWith(
+    expect(mockConsole.log).toHaveBeenCalledTimes(1);
+    expect(mockConsole.log).toHaveBeenCalledWith(
       "Message 1",
       "Message 2",
       { data: "test" }

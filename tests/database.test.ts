@@ -1,6 +1,6 @@
 import { noopAdapter } from "../db/adapter";
 import { createDrizzleAdapter } from "../db/drizzle";
-import { logsTable } from "../schema";
+import { appLogsTable } from "../schema";
 
 describe("Database adapters", () => {
   describe("NoopAdapter", () => {
@@ -57,7 +57,7 @@ describe("Database adapters", () => {
       
       // Verify the insert was called with the correct table
       expect(insertMock).toHaveBeenCalledTimes(1);
-      expect(insertMock).toHaveBeenCalledWith(logsTable);
+      expect(insertMock).toHaveBeenCalledWith(appLogsTable);
       
       // Verify values was called with an object containing the correct fields
       expect(valuesMock).toHaveBeenCalledTimes(1);
@@ -91,7 +91,7 @@ describe("Database adapters", () => {
       // Verify the query chain was called correctly
       expect(selectMock).toHaveBeenCalledTimes(1);
       expect(fromMock).toHaveBeenCalledTimes(1);
-      expect(fromMock).toHaveBeenCalledWith(logsTable);
+      expect(fromMock).toHaveBeenCalledWith(appLogsTable);
       expect(orderByMock).toHaveBeenCalledTimes(1);
       
       // Verify returned logs
@@ -113,7 +113,7 @@ describe("Database adapters", () => {
       
       // Verify delete was called with the logs table
       expect(deleteMock).toHaveBeenCalledTimes(1);
-      expect(deleteMock).toHaveBeenCalledWith(logsTable);
+      expect(deleteMock).toHaveBeenCalledWith(appLogsTable);
       
       // Verify the function returned true for success
       expect(result).toBe(true);

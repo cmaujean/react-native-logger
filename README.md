@@ -234,7 +234,7 @@ function LogsScreen() {
 
 ### Database
 
-- `logsTable`: Drizzle table definition for logs
+- `logsTable`, `appLogsTable`: Drizzle table definitions for logs
 - `createDrizzleAdapter(db)`: Create a Drizzle adapter for database storage
 - `noopAdapter`: No-op adapter for when no database is needed
 
@@ -273,6 +273,60 @@ The current test setup has the following characteristics:
 
 - React tests show some deprecation warnings about react-test-renderer being deprecated. These warnings do not affect functionality and are related to the testing library, not our code.
 - When running React tests, you may see warnings about "The current testing environment is not configured to support act(...)". These are harmless warnings from the React testing library.
+
+## Schema and Migrations
+
+### Schema Structure in v0.2.0+
+
+Starting with v0.2.0, the logger includes improved support for Drizzle migrations with a dedicated schema export:
+
+```typescript
+// In your schema.ts file:
+import { appLogsTable } from '@consensu.al/react-native-logger/schema';
+import { sqliteTable /* ... */ } from 'drizzle-orm/sqlite-core';
+
+// Your other table definitions
+export const users = sqliteTable('users', { /* ... */ });
+
+// Re-export the logs table to include it in your schema
+export { appLogsTable };
+```
+
+The `appLogsTable` (or `logsTable`) defines a table with the following columns:
+
+| Column    | Type   | Description                            |
+|-----------|--------|----------------------------------------|
+| id        | text   | Primary key, auto-generated using cuid2 |
+| timestamp | text   | Timestamp of the log entry, auto-generated |
+| level     | text   | Log level (debug, info, warn, error)   |
+| message   | text   | The log message                        |
+| metadata  | text   | JSON-stringified metadata object       |
+
+### Generating Migrations
+
+With the schema imported in your Drizzle schema file, you can generate migrations that include the logs table:
+
+```bash
+bun run db:generate
+```
+
+### Database Adapter with Metadata
+
+The logger's database adapter supports storing additional metadata with log entries:
+
+```typescript
+// Configure with database adapter
+const logger = createLogger({
+  // options...
+}, createDrizzleAdapter(db));
+
+// Log with metadata
+logger.log('User action', { 
+  userId: 'user123', 
+  action: 'login',
+  context: 'mobile' 
+});
+```
 
 ## License
 

@@ -9,7 +9,7 @@ export {};
 declare global {
   namespace NodeJS {
     interface Global {
-      _pendingLogs: Array<{ level: string; message: string; timestamp: string }>;
+      _pendingLogs: Array<{ level: string; message: string; metadata?: Record<string, any>; timestamp: string }>;
       mockConsole: {
         log: jest.Mock;
         warn: jest.Mock;
@@ -30,24 +30,24 @@ console._originalWarn = console.warn;
 console._originalError = console.error;
 
 // Create mock console functions
-(global as any).mockConsole = {
+global.mockConsole = {
   log: jest.fn(),
   warn: jest.fn(),
   error: jest.fn()
 };
 
 // Initialize _pendingLogs global array for testing
-(global as any)._pendingLogs = [];
+global._pendingLogs = [];
 
 // Clean up before each test
 beforeEach(() => {
   jest.clearAllMocks();
-  (global as any)._pendingLogs = [];
+  global._pendingLogs = [];
   
   // Set up mock console functions
-  console.log = (global as any).mockConsole.log;
-  console.warn = (global as any).mockConsole.warn;
-  console.error = (global as any).mockConsole.error;
+  console.log = global.mockConsole.log;
+  console.warn = global.mockConsole.warn;
+  console.error = global.mockConsole.error;
 });
 
 // Restore original console methods after each test

@@ -1,9 +1,12 @@
 import { createId } from '@paralleldrive/cuid2';
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
 import { LoggerDbAdapter } from './adapter';
-import { logsTable } from '../schema';
+import { appLogsTable } from '../schema';
 import type { LogLevel } from '../types';
 import { IS_DEV } from '../constants';
+
+// Add type for _pendingLogs only if you need to access it from this file
+// The global type is already defined in tests/setup.ts
 
 /**
  * Create a Drizzle ORM adapter for logging
@@ -15,19 +18,25 @@ export function createDrizzleAdapter(db: BaseSQLiteDatabase<any, any>): LoggerDb
   /**
    * Add a log entry to the database
    */
-  const addLogEntry = async (level: LogLevel, message: string): Promise<void> => {
+  const addLogEntry = async (level: LogLevel, message: string, metadata?: Record<string, any>): Promise<void> => {
     try {
       // Check if the log table exists before attempting to insert
       try {
-        await db.insert(logsTable).values({
+        await db.insert(appLogsTable).values({
           id: createId(),
           level,
           message,
+          metadata: metadata ? JSON.stringify(metadata) : null,
           // timestamp will be set by default in the database
         });
       } catch (insertError) {
         // If the table doesn't exist, store logs in memory until migrations complete
-        const logEntry = { level, message, timestamp: new Date().toISOString() };
+        const logEntry = { 
+          level, 
+          message, 
+          metadata,
+          timestamp: new Date().toISOString() 
+        };
         
         // Create a global array to store pending logs if it doesn't exist
         if (!global._pendingLogs) {
@@ -56,7 +65,7 @@ export function createDrizzleAdapter(db: BaseSQLiteDatabase<any, any>): LoggerDb
    */
   const getLogs = async () => {
     try {
-      const logs = await db.select().from(logsTable).orderBy(logsTable.timestamp);
+      const logs = await db.select().from(appLogsTable).orderBy(appLogsTable.timestamp);
       return logs;
     } catch (error) {
       // Use original console to avoid circular logging, but only in development mode
@@ -72,7 +81,7 @@ export function createDrizzleAdapter(db: BaseSQLiteDatabase<any, any>): LoggerDb
    */
   const clearLogs = async (): Promise<boolean> => {
     try {
-      await db.delete(logsTable);
+      await db.delete(appLogsTable);
       return true;
     } catch (error) {
       // Use original console to avoid circular logging, but only in development mode
@@ -98,7 +107,7 @@ export function createDrizzleAdapter(db: BaseSQLiteDatabase<any, any>): LoggerDb
           }
           
           for (const log of global._pendingLogs) {
-            await addLogEntry(log.level, log.message);
+            await addLogEntry(log.level as LogLevel, log.message, (log as any).metadata);
           }
           
           // Clear the pending logs

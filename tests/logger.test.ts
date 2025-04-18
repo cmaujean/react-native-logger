@@ -3,10 +3,33 @@ import { noopAdapter } from "../db/adapter";
 import type { LogLevel } from "../types";
 
 describe("Logger core functionality", () => {
-  // Now using the global test setup from setup.ts
-  // We don't need any console setup here because it's handled there
+  // Set up mocks for console methods
+  const mockConsole = {
+    log: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn()
+  };
+
+  // Store original console methods
+  const originalConsole = {
+    log: console.log,
+    warn: console.warn,
+    error: console.error
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
+    // Set up mock console methods for each test
+    console.log = mockConsole.log;
+    console.warn = mockConsole.warn;
+    console.error = mockConsole.error;
+  });
+
+  afterEach(() => {
+    // Restore original console methods
+    console.log = originalConsole.log;
+    console.warn = originalConsole.warn;
+    console.error = originalConsole.error;
   });
   
 
@@ -41,9 +64,9 @@ describe("Logger core functionality", () => {
     logger.warn("Test warning");
     logger.error("Test error");
     
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1);
-    expect((global as any).mockConsole.warn).toHaveBeenCalledTimes(1);
-    expect((global as any).mockConsole.error).toHaveBeenCalledTimes(1);
+    expect(mockConsole.log).toHaveBeenCalledTimes(1);
+    expect(mockConsole.warn).toHaveBeenCalledTimes(1);
+    expect(mockConsole.error).toHaveBeenCalledTimes(1);
   });
   
   test("should not log to console when console option is false", () => {
@@ -56,9 +79,9 @@ describe("Logger core functionality", () => {
     logger.warn("Test warning");
     logger.error("Test error");
     
-    expect((global as any).mockConsole.log).not.toHaveBeenCalled();
-    expect((global as any).mockConsole.warn).not.toHaveBeenCalled();
-    expect((global as any).mockConsole.error).not.toHaveBeenCalled();
+    expect(mockConsole.log).not.toHaveBeenCalled();
+    expect(mockConsole.warn).not.toHaveBeenCalled();
+    expect(mockConsole.error).not.toHaveBeenCalled();
   });
   
   test("should not log when logger is disabled", () => {
@@ -71,9 +94,9 @@ describe("Logger core functionality", () => {
     logger.warn("Test warning");
     logger.error("Test error");
     
-    expect((global as any).mockConsole.log).not.toHaveBeenCalled();
-    expect((global as any).mockConsole.warn).not.toHaveBeenCalled();
-    expect((global as any).mockConsole.error).not.toHaveBeenCalled();
+    expect(mockConsole.log).not.toHaveBeenCalled();
+    expect(mockConsole.warn).not.toHaveBeenCalled();
+    expect(mockConsole.error).not.toHaveBeenCalled();
   });
   
   test("should enable and disable logging", () => {
@@ -84,17 +107,17 @@ describe("Logger core functionality", () => {
     
     // Initially disabled
     logger.log("This should not be logged");
-    expect((global as any).mockConsole.log).not.toHaveBeenCalled();
+    expect(mockConsole.log).not.toHaveBeenCalled();
     
     // Enable logging
     logger.setEnabled(true);
     logger.log("This should be logged");
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1);
+    expect(mockConsole.log).toHaveBeenCalledTimes(1);
     
     // Disable logging again
     logger.setEnabled(false);
     logger.log("This should not be logged");
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1); // Count stays the same
+    expect(mockConsole.log).toHaveBeenCalledTimes(1); // Count stays the same
   });
   
   test("should enable and disable secure mode", () => {
@@ -119,8 +142,8 @@ describe("Logger core functionality", () => {
     }, noopAdapter);
     
     logger.log("Message 1", "Message 2", { data: "test" });
-    expect((global as any).mockConsole.log).toHaveBeenCalledTimes(1);
-    expect((global as any).mockConsole.log).toHaveBeenCalledWith(
+    expect(mockConsole.log).toHaveBeenCalledTimes(1);
+    expect(mockConsole.log).toHaveBeenCalledWith(
       "Message 1",
       "Message 2",
       { data: "test" }
@@ -129,7 +152,7 @@ describe("Logger core functionality", () => {
   
   test("should use the provided database adapter", () => {
     const mockAdapter = {
-      addLogEntry: jest.fn((level: LogLevel, message: string) => Promise.resolve()),
+      addLogEntry: jest.fn((level: LogLevel, message: string, metadata?: Record<string, any>) => Promise.resolve()),
       getLogs: jest.fn(() => Promise.resolve([])),
       clearLogs: jest.fn(() => Promise.resolve(true)),
     };
@@ -141,6 +164,6 @@ describe("Logger core functionality", () => {
     logger.log("Test database log");
     
     expect(mockAdapter.addLogEntry).toHaveBeenCalledTimes(1);
-    expect(mockAdapter.addLogEntry).toHaveBeenCalledWith("log", expect.any(String));
+    expect(mockAdapter.addLogEntry).toHaveBeenCalledWith("log", expect.any(String), null);
   });
 });

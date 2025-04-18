@@ -19,7 +19,7 @@ export { redactValue, redactSensitiveInfo } from './redaction';
 export { createDrizzleAdapter, noopAdapter, type LoggerDbAdapter } from './db';
 
 // Export schema for database setup
-export { logsTable } from './schema';
+export { logsTable, appLogsTable } from './schema';
 
 // Export React hooks and components
 export { useLogger, withLogger } from './hooks';
