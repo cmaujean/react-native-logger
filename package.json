@@ -1,6 +1,6 @@
 {
   "name": "@consensu.al/react-native-logger",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A flexible, secure, and feature-rich on device logging system for React Native applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -12,13 +12,16 @@
       "types": "./dist/index.d.ts"
     },
     "./schema": {
-      "import": "./dist/schema.mjs",
-      "require": "./dist/schema.js",
-      "types": "./dist/schema/index.d.ts"
+      "import": "./schema.mjs",
+      "require": "./schema.js",
+      "types": "./schema/index.d.ts"
     }
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "schema/**/*",
+    "schema.js",
+    "schema.mjs"
   ],
   "scripts": {
     "build": "bun run build:clean && bun run build:cjs && bun run build:esm && bun run build:types && bun run build:schema",
@@ -26,7 +29,7 @@
     "build:cjs": "tsc --module commonjs --outDir dist",
     "build:esm": "tsc --module esnext --outDir dist/esm && mv dist/esm/index.js dist/index.mjs",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types",
-    "build:schema": "cp schema.js dist/ && cp schema.mjs dist/",
+    "build:schema": "mkdir -p dist/schema && cp schema/index.d.ts dist/schema/",
     "prepare": "bun run build",
     "test": "bun jest --no-cache",
     "test:watch": "bun jest --watch --no-cache",
