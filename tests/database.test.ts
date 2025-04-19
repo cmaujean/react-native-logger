@@ -1,6 +1,5 @@
 import { noopAdapter } from "../db/adapter";
-import { createDrizzleAdapter } from "../db/drizzle";
-import { appLogsTable } from "../schema";
+import { createDrizzleAdapter, appLogsTable } from "../db/drizzle";
 
 describe("Database adapters", () => {
   describe("NoopAdapter", () => {

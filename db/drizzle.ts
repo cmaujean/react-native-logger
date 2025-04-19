@@ -1,9 +1,22 @@
 import { createId } from '@paralleldrive/cuid2';
 import type { BaseSQLiteDatabase } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { LoggerDbAdapter } from './adapter';
-import { appLogsTable } from '../schema';
 import type { LogLevel } from '../types';
 import { IS_DEV } from '../constants';
+
+// Define the logs table schema directly in the file
+export const appLogsTable = sqliteTable('app_logs', {
+  id: text('id')
+    .$defaultFn(() => createId())
+    .notNull()
+    .primaryKey(),
+  timestamp: text('timestamp').default(sql`(CURRENT_TIMESTAMP)`),
+  level: text('level').notNull(), // 'debug', 'info', 'warn', 'error'
+  message: text('message').notNull(),
+  metadata: text('metadata'), // JSON stringified metadata
+});
 
 // Add type for _pendingLogs only if you need to access it from this file
 // The global type is already defined in tests/setup.ts

@@ -1,9 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createDrizzleAdapter = void 0;
+exports.createDrizzleAdapter = exports.appLogsTable = void 0;
 const cuid2_1 = require("@paralleldrive/cuid2");
-const schema_1 = require("../schema");
+const drizzle_orm_1 = require("drizzle-orm");
+const sqlite_core_1 = require("drizzle-orm/sqlite-core");
 const constants_1 = require("../constants");
+// Define the logs table schema directly in the file
+exports.appLogsTable = (0, sqlite_core_1.sqliteTable)('app_logs', {
+    id: (0, sqlite_core_1.text)('id')
+        .$defaultFn(() => (0, cuid2_1.createId)())
+        .notNull()
+        .primaryKey(),
+    timestamp: (0, sqlite_core_1.text)('timestamp').default((0, drizzle_orm_1.sql) `(CURRENT_TIMESTAMP)`),
+    level: (0, sqlite_core_1.text)('level').notNull(),
+    message: (0, sqlite_core_1.text)('message').notNull(),
+    metadata: (0, sqlite_core_1.text)('metadata'), // JSON stringified metadata
+});
 // Add type for _pendingLogs only if you need to access it from this file
 // The global type is already defined in tests/setup.ts
 /**
@@ -20,7 +32,7 @@ function createDrizzleAdapter(db) {
         try {
             // Check if the log table exists before attempting to insert
             try {
-                await db.insert(schema_1.appLogsTable).values({
+                await db.insert(exports.appLogsTable).values({
                     id: (0, cuid2_1.createId)(),
                     level,
                     message,
@@ -61,7 +73,7 @@ function createDrizzleAdapter(db) {
      */
     const getLogs = async () => {
         try {
-            const logs = await db.select().from(schema_1.appLogsTable).orderBy(schema_1.appLogsTable.timestamp);
+            const logs = await db.select().from(exports.appLogsTable).orderBy(exports.appLogsTable.timestamp);
             return logs;
         }
         catch (error) {
@@ -77,7 +89,7 @@ function createDrizzleAdapter(db) {
      */
     const clearLogs = async () => {
         try {
-            await db.delete(schema_1.appLogsTable);
+            await db.delete(exports.appLogsTable);
             return true;
         }
         catch (error) {

@@ -276,13 +276,26 @@ The current test setup has the following characteristics:
 
 ## Schema and Migrations
 
-### Schema Structure in v0.2.0+
+### Schema Setup in v0.3.0+
 
-Starting with v0.2.0, the logger includes improved support for Drizzle migrations with a dedicated schema export:
+Starting with v0.3.0, we've simplified the schema setup process with a dedicated generator script:
+
+```bash
+# Using npm
+npx generate-logging-schema
+
+# Using yarn
+yarn generate-logging-schema
+
+# Using bun
+bun x generate-logging-schema
+```
+
+This script creates a `logging-schema.ts` file in your `db/` directory which you can then import directly into your Drizzle schema:
 
 ```typescript
 // In your schema.ts file:
-import { appLogsTable } from '@consensu.al/react-native-logger/schema';
+import { appLogsTable } from './logging-schema';
 import { sqliteTable /* ... */ } from 'drizzle-orm/sqlite-core';
 
 // Your other table definitions
@@ -292,7 +305,7 @@ export const users = sqliteTable('users', { /* ... */ });
 export { appLogsTable };
 ```
 
-The `appLogsTable` (or `logsTable`) defines a table with the following columns:
+The `appLogsTable` defines a table with the following columns:
 
 | Column    | Type   | Description                            |
 |-----------|--------|----------------------------------------|
@@ -307,7 +320,7 @@ The `appLogsTable` (or `logsTable`) defines a table with the following columns:
 With the schema imported in your Drizzle schema file, you can generate migrations that include the logs table:
 
 ```bash
-bun run db:generate
+bun x drizzle-kit generate
 ```
 
 ### Database Adapter with Metadata

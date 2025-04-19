@@ -1,16 +1,35 @@
 # Logger Schema for Drizzle ORM
 
-This directory contains the schema definition for the logger's database tables. The schema is designed to work with Drizzle ORM and SQLite.
+This directory contains the internal schema definition for the logger's database tables. 
 
-## Usage in your project
+## Using the Schema in Your Project
 
-### 1. Import the schema directly
+We've simplified the process for including the logger's schema in your Drizzle setup:
 
-For Drizzle migrations and schema definitions, import the schema directly using the subpath export:
+### 1. Generate the Schema File
+
+After installing the package, run the included script to generate a schema file in your project:
+
+```bash
+# Using npm
+npx generate-logging-schema
+
+# Using yarn
+yarn generate-logging-schema
+
+# Using bun
+bun x generate-logging-schema
+```
+
+This will create a `logging-schema.ts` file in your `db/` directory.
+
+### 2. Import in Your Schema
+
+In your main Drizzle schema file (typically `db/schema.ts`), import and re-export the logging schema:
 
 ```typescript
 // In your schema.ts file
-import { appLogsTable } from '@consensu.al/react-native-logger/schema';
+import { appLogsTable } from './logging-schema';
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
 // Your other table definitions
@@ -22,7 +41,7 @@ export const users = sqliteTable('users', {
 export { appLogsTable };
 ```
 
-### 2. Configure the database adapter
+### 3. Configure the Database Adapter
 
 After setting up your database with Drizzle, create a database adapter for the logger:
 
@@ -56,8 +75,8 @@ When you run your Drizzle migrations, the logs table will be included in the gen
 
 ```bash
 # Generate migrations
-bun run db:generate
+bun x drizzle-kit generate
 
 # Run migrations
-bun run db:migrate
+bun x drizzle-kit migrate
 ```
