@@ -9,7 +9,7 @@
  * - Customizable formatting and log levels
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LOGGER_SECURE_MODE_KEY = exports.LOGGER_ENABLED_KEY = exports.IS_DEV = exports.setDatabaseAdapter = exports.getLoggerConfig = exports.enableSecureMode = exports.enableLogging = exports.error = exports.warn = exports.log = exports.logger = exports.initializeLoggerSingleton = exports.LoggerSettings = exports.useLoggerSettings = exports.LoggerProvider = exports.withLogger = exports.useLogger = exports.logsTable = exports.noopAdapter = exports.createDrizzleAdapter = exports.redactSensitiveInfo = exports.redactValue = exports.createLogger = void 0;
+exports.LOGGER_SECURE_MODE_KEY = exports.LOGGER_ENABLED_KEY = exports.IS_DEV = exports.setDatabaseAdapter = exports.getLoggerConfig = exports.enableSecureMode = exports.enableLogging = exports.error = exports.warn = exports.log = exports.logger = exports.initializeLoggerSingleton = exports.LoggerSettings = exports.useLoggerSettings = exports.LoggerProvider = exports.withLogger = exports.useLogger = exports.appLogsTable = exports.logsTable = exports.noopAdapter = exports.createDrizzleAdapter = exports.redactSensitiveInfo = exports.redactValue = exports.createLogger = void 0;
 // Export core functionality
 var logger_1 = require("./logger");
 Object.defineProperty(exports, "createLogger", { enumerable: true, get: function () { return logger_1.createLogger; } });
@@ -23,6 +23,7 @@ Object.defineProperty(exports, "noopAdapter", { enumerable: true, get: function 
 // Export schema for database setup
 var schema_1 = require("./schema");
 Object.defineProperty(exports, "logsTable", { enumerable: true, get: function () { return schema_1.logsTable; } });
+Object.defineProperty(exports, "appLogsTable", { enumerable: true, get: function () { return schema_1.appLogsTable; } });
 // Export React hooks and components
 var hooks_1 = require("./hooks");
 Object.defineProperty(exports, "useLogger", { enumerable: true, get: function () { return hooks_1.useLogger; } });

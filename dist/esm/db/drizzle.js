@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createDrizzleAdapter = void 0;
-const cuid2_1 = require("@paralleldrive/cuid2");
-const schema_1 = require("../schema");
-const constants_1 = require("../constants");
+import { createId } from '@paralleldrive/cuid2';
+import { appLogsTable } from '../schema';
+import { IS_DEV } from '../constants';
 // Add type for _pendingLogs only if you need to access it from this file
 // The global type is already defined in tests/setup.ts
 /**
@@ -12,7 +9,7 @@ const constants_1 = require("../constants");
  * @param db Drizzle SQLite database instance
  * @returns Database adapter for logging
  */
-function createDrizzleAdapter(db) {
+export function createDrizzleAdapter(db) {
     /**
      * Add a log entry to the database
      */
@@ -20,8 +17,8 @@ function createDrizzleAdapter(db) {
         try {
             // Check if the log table exists before attempting to insert
             try {
-                await db.insert(schema_1.appLogsTable).values({
-                    id: (0, cuid2_1.createId)(),
+                await db.insert(appLogsTable).values({
+                    id: createId(),
                     level,
                     message,
                     metadata: metadata ? JSON.stringify(metadata) : null,
@@ -43,7 +40,7 @@ function createDrizzleAdapter(db) {
                 // Add to pending logs
                 global._pendingLogs.push(logEntry);
                 // Only log the error in dev mode
-                if (constants_1.IS_DEV && console._originalError) {
+                if (IS_DEV && console._originalError) {
                     console._originalError('Error adding log entry (stored in memory):', insertError);
                 }
             }
@@ -51,7 +48,7 @@ function createDrizzleAdapter(db) {
         catch (error) {
             // Don't log this error to avoid infinite loops
             // Log to the original console in development mode only
-            if (constants_1.IS_DEV && console._originalError) {
+            if (IS_DEV && console._originalError) {
                 console._originalError('Error in addLogEntry:', error);
             }
         }
@@ -61,12 +58,12 @@ function createDrizzleAdapter(db) {
      */
     const getLogs = async () => {
         try {
-            const logs = await db.select().from(schema_1.appLogsTable).orderBy(schema_1.appLogsTable.timestamp);
+            const logs = await db.select().from(appLogsTable).orderBy(appLogsTable.timestamp);
             return logs;
         }
         catch (error) {
             // Use original console to avoid circular logging, but only in development mode
-            if (constants_1.IS_DEV && console._originalError) {
+            if (IS_DEV && console._originalError) {
                 console._originalError('Error getting logs:', error);
             }
             return [];
@@ -77,12 +74,12 @@ function createDrizzleAdapter(db) {
      */
     const clearLogs = async () => {
         try {
-            await db.delete(schema_1.appLogsTable);
+            await db.delete(appLogsTable);
             return true;
         }
         catch (error) {
             // Use original console to avoid circular logging, but only in development mode
-            if (constants_1.IS_DEV && console._originalError) {
+            if (IS_DEV && console._originalError) {
                 console._originalError('Error clearing logs:', error);
             }
             return false;
@@ -99,7 +96,7 @@ function createDrizzleAdapter(db) {
             setTimeout(async () => {
                 try {
                     // Process each pending log
-                    if (constants_1.IS_DEV && console._originalLog) {
+                    if (IS_DEV && console._originalLog) {
                         console._originalLog('Processing pending logs:', global._pendingLogs.length);
                     }
                     for (const log of global._pendingLogs) {
@@ -109,7 +106,7 @@ function createDrizzleAdapter(db) {
                     global._pendingLogs = [];
                 }
                 catch (e) {
-                    if (constants_1.IS_DEV && console._originalError) {
+                    if (IS_DEV && console._originalError) {
                         console._originalError('Error processing pending logs:', e);
                     }
                 }
@@ -124,4 +121,3 @@ function createDrizzleAdapter(db) {
         clearLogs,
     };
 }
-exports.createDrizzleAdapter = createDrizzleAdapter;

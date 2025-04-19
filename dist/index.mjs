@@ -7,12 +7,17 @@
  * - React context and hooks for easy usage in components
  * - Customizable formatting and log levels
  */
-export type { Logger, LoggerOptions, LogLevel, LogEntry } from './types';
+// Export core functionality
 export { createLogger } from './logger';
 export { redactValue, redactSensitiveInfo } from './redaction';
-export { createDrizzleAdapter, noopAdapter, type LoggerDbAdapter } from './db';
+// Export database adapters
+export { createDrizzleAdapter, noopAdapter } from './db';
+// Export schema for database setup
 export { logsTable, appLogsTable } from './schema';
+// Export React hooks and components
 export { useLogger, withLogger } from './hooks';
 export { LoggerProvider, useLoggerSettings, LoggerSettings } from './provider';
+// Export the singleton instance for convenience
 export { initializeLoggerSingleton, logger, log, warn, error, enableLogging, enableSecureMode, getLoggerConfig, setDatabaseAdapter, } from './singleton';
+// Export constants
 export { IS_DEV, LOGGER_ENABLED_KEY, LOGGER_SECURE_MODE_KEY } from './constants';

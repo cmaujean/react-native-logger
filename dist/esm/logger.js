@@ -1,18 +1,15 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createLogger = void 0;
-const constants_1 = require("./constants");
-const adapter_1 = require("./db/adapter");
-const redaction_1 = require("./redaction");
+import { IS_DEV, originalConsole } from './constants';
+import { noopAdapter } from './db/adapter';
+import { redactValue } from './redaction';
 // Make sure we have the original methods available globally
 if (!console._originalLog) {
-    console._originalLog = constants_1.originalConsole.log;
+    console._originalLog = originalConsole.log;
 }
 if (!console._originalWarn) {
-    console._originalWarn = constants_1.originalConsole.warn;
+    console._originalWarn = originalConsole.warn;
 }
 if (!console._originalError) {
-    console._originalError = constants_1.originalConsole.error;
+    console._originalError = originalConsole.error;
 }
 /**
  * Process arguments for logging, converting them to a single string
@@ -21,7 +18,7 @@ function processArgs(args, secureMode) {
     try {
         // Apply redaction if in secure mode
         const processedArgs = secureMode
-            ? args.map((arg) => (0, redaction_1.redactValue)(arg))
+            ? args.map((arg) => redactValue(arg))
             : args;
         // Convert arguments to strings
         return processedArgs
@@ -50,13 +47,13 @@ function processArgs(args, secureMode) {
  * @param dbAdapter Database adapter for persisting logs (optional)
  * @returns Logger instance
  */
-function createLogger(options = {}, dbAdapter = adapter_1.noopAdapter) {
+export function createLogger(options = {}, dbAdapter = noopAdapter) {
     var _a, _b, _c;
     // Default options
     const loggerState = {
         enabled: (_a = options.enabled) !== null && _a !== void 0 ? _a : true,
         secureMode: (_b = options.secureMode) !== null && _b !== void 0 ? _b : true,
-        console: (_c = options.console) !== null && _c !== void 0 ? _c : (constants_1.IS_DEV ? true : false), // Default to console in dev mode
+        console: (_c = options.console) !== null && _c !== void 0 ? _c : (IS_DEV ? true : false), // Default to console in dev mode
     };
     /**
      * Log handler for all log levels
@@ -69,7 +66,7 @@ function createLogger(options = {}, dbAdapter = adapter_1.noopAdapter) {
         const argsForProcessing = [...args];
         // Always log to console in development mode
         // In production, only log to console if explicitly enabled
-        if (constants_1.IS_DEV || loggerState.console) {
+        if (IS_DEV || loggerState.console) {
             // Special handling for test environment - use mockConsole if available
             if (typeof global !== 'undefined' && typeof global.mockConsole !== 'undefined') {
                 switch (level) {
@@ -128,4 +125,3 @@ function createLogger(options = {}, dbAdapter = adapter_1.noopAdapter) {
         }),
     };
 }
-exports.createLogger = createLogger;

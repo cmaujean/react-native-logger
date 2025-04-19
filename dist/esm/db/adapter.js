@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.noopAdapter = void 0;
 /**
  * No-op adapter for when no database is provided
  */
-exports.noopAdapter = {
+export const noopAdapter = {
     async addLogEntry(_level, _message, _metadata) {
         // Do nothing
         return Promise.resolve();
