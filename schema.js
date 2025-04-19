@@ -8,10 +8,5 @@
 
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
-// Re-export schema from the schema directory
-var schema = require('./schema/index');
-
-exports.appLogsTable = schema.appLogsTable;
-exports.logsTable = schema.logsTable;
+// Re-export schema from the compiled schema file
+module.exports = require('./dist/schema/index.js');

@@ -6,5 +6,5 @@
  * process JSX or React code.
  */
 
-// Re-export schema from the schema directory
-export { appLogsTable, logsTable } from './schema/index.js';
+// Re-export schema from the compiled schema file
+export * from './dist/schema/index.mjs';

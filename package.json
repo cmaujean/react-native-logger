@@ -1,6 +1,6 @@
 {
   "name": "@consensu.al/react-native-logger",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A flexible, secure, and feature-rich on device logging system for React Native applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -29,7 +29,7 @@
     "build:cjs": "tsc --module commonjs --outDir dist",
     "build:esm": "tsc --module esnext --outDir dist/esm && mv dist/esm/index.js dist/index.mjs",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types",
-    "build:schema": "mkdir -p dist/schema && cp schema/index.d.ts dist/schema/",
+    "build:schema": "mkdir -p dist/schema && cp schema/index.d.ts dist/schema/ && cp schema/standalone/*.js dist/schema/ && cp schema/standalone/*.mjs dist/schema/",
     "prepare": "bun run build",
     "test": "bun jest --no-cache",
     "test:watch": "bun jest --watch --no-cache",
@@ -73,9 +73,7 @@
     "typescript": "^4.9.0"
   },
   "dependencies": {
-    "@paralleldrive/cuid2": "^2.2.0"
-  },
-  "optionalDependencies": {
+    "@paralleldrive/cuid2": "^2.2.0",
     "drizzle-orm": "^0.28.0"
   }
 }

@@ -14,5 +14,5 @@
 		"alwaysStrict": false
 	},
 	"include": ["**/*.ts", "**/*.tsx"],
-	"exclude": ["node_modules", "dist", "__tests__", "tests/**/*"]
+	"exclude": ["node_modules", "dist", "__tests__", "tests/**/*", "schema/standalone"]
 }
